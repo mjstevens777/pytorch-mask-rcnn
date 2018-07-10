@@ -1,5 +1,5 @@
+#include "crop_and_resize_gpu.h"
 #include <torch/torch.h>
-#include <THC/THC.h>
 #include "cuda/crop_and_resize_kernel.h"
 
 

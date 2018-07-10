@@ -1,5 +1,5 @@
+#include "crop_and_resize.h"
 #include <torch/torch.h>
-#include <TH/TH.h>
 #include <stdio.h>
 #include <math.h>
 

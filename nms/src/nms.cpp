@@ -1,5 +1,5 @@
+#include "nms.h"
 #include <torch/torch.h>
-#include <TH/TH.h>
 #include <math.h>
 
 int cpu_nms(at::Tensor keep_out, at::Tensor num_out, at::Tensor boxes, at::Tensor order, at::Tensor areas, float nms_overlap_thresh) {

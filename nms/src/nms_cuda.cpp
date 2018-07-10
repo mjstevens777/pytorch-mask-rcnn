@@ -4,6 +4,7 @@
 // Licensed under The MIT License [see fast-rcnn/LICENSE for details]
 // Written by Shaoqing Ren
 // ------------------------------------------------------------------
+#include "nms_cuda.h"
 #include <torch/torch.h>
 #include <THC/THC.h>
 #include <TH/TH.h>
