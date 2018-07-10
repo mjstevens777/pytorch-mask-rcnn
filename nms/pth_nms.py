@@ -1,6 +1,19 @@
 import torch
-from ._ext import nms
 import numpy as np
+import torch.utils.cpp_extension
+import os
+
+_cpu_nms = torch.utils.cpp_extension.load(
+    'cpu_nms', [
+        os.path.join(os.path.dirname(__file__), 'src/nms.c')
+    ])
+
+if torch.cuda.is_available():
+    _gpu_nms = torch.utils.cpp_extension.load(
+        'gpu_nms', [
+            os.path.join(os.path.dirname(__file__), 'src/nms_cuda.c'),
+            os.path.join(os.path.dirname(__file__), 'src/cuda/nms_kernel.cu')
+        ])
 
 def pth_nms(dets, thresh):
   """
@@ -19,7 +32,7 @@ def pth_nms(dets, thresh):
 
     keep = torch.LongTensor(dets.size(0))
     num_out = torch.LongTensor(1)
-    nms.cpu_nms(keep, num_out, dets, order, areas, thresh)
+    _cpu_nms.cpu_nms(keep, num_out, dets, order, areas, thresh)
 
     return keep[:num_out[0]]
   else:
@@ -46,7 +59,7 @@ def pth_nms(dets, thresh):
     num_out = torch.LongTensor(1)
     # keep = torch.cuda.LongTensor(dets.size(0))
     # num_out = torch.cuda.LongTensor(1)
-    nms.gpu_nms(keep, num_out, dets_temp, thresh)
+    _gpu_nms.gpu_nms(keep, num_out, dets_temp, thresh)
 
     return order[keep[:num_out[0]].cuda()].contiguous()
     # return order[keep[:num_out[0]]].contiguous()

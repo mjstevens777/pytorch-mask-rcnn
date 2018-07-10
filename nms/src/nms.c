@@ -1,3 +1,4 @@
+#include <torch/torch.h>
 #include <TH/TH.h>
 #include <math.h>
 
@@ -66,4 +67,13 @@ int cpu_nms(THLongTensor * keep_out, THLongTensor * num_out, THFloatTensor * box
     *num_out_flat = num_to_keep;
     THByteTensor_free(suppressed);
     return 1;
+}
+
+PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+  m.def(
+    "cpu_nms", &cpu_nms, R"docstring(
+      NMS
+    )docstring",
+    py::arg("keep_out"), py::arg("num_out"), py::arg("boxes"),
+    py::arg("order"), py::arg("areas"), py::arg("nms_overlap_thresh"));
 }

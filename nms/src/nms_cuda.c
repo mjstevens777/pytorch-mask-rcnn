@@ -4,6 +4,7 @@
 // Licensed under The MIT License [see fast-rcnn/LICENSE for details]
 // Written by Shaoqing Ren
 // ------------------------------------------------------------------
+#include <torch/torch.h>
 #include <THC/THC.h>
 #include <TH/TH.h>
 #include <math.h>
@@ -64,4 +65,13 @@ int gpu_nms(THLongTensor * keep, THLongTensor* num_out, THCudaTensor * boxes, fl
   THLongTensor_free(remv_cpu);
 
   return 1;
+}
+
+PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+  m.def(
+    "gpu_nms", &gpu_nms, R"docstring(
+      NMS
+    )docstring",
+    py::arg("keep"), py::arg("num_out"), py::arg("boxes"),
+    py::arg("nms_overlap_thresh"));
 }
