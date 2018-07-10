@@ -4,19 +4,19 @@ from setuptools import find_packages
 
 
 setup(
-    name='pytorch_mask_rcnn',
-    version='0.1',
+    name='pytorch-mask-rcnn',
+    version='0.1.1',
     description='A PyTorch port of the Matterport Mask R-CNN',
     url='http://github.com/mjstevens777/pytorch-mask-rcnn',
     license='MIT',
     packages=find_packages(),
     install_requires=[
-        # Keep these in sync with requirements.txt
         'torch',
         'matplotlib',
         'scipy',
         'scikit-image',
         'h5py',
+        'pycocotools',
     ],
     package_data={
         'pytorch_mask_rcnn': [
