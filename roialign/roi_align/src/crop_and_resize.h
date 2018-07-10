@@ -1,3 +1,5 @@
+#include <torch/torch.h>
+
 void crop_and_resize_forward(
     at::Tensor image,
     at::Tensor boxes,      // [y1, x1, y2, x2]
