@@ -8,13 +8,13 @@ import os
 
 _cpu_backend = cpp_extension.load(
     "cpu_crop_and_resize", [
-        os.path.join(os.path.dirname(__file__), "src/crop_and_resize.c")
+        os.path.join(os.path.dirname(__file__), "src/crop_and_resize.cpp")
     ])
 
 
 _gpu_backend = cpp_extension.load(
     "gpu_crop_and_resize", [
-        os.path.join(os.path.dirname(__file__), "src/crop_and_resize_gpu.c"),
+        os.path.join(os.path.dirname(__file__), "src/crop_and_resize_gpu.cpp"),
         os.path.join(os.path.dirname(__file__), "src/cuda/crop_and_resize_kernel.cu"),
     ])
 

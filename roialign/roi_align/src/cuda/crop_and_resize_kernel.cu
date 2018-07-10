@@ -144,21 +144,21 @@ void CropAndResizeBackpropImageKernel(
         float *pimage = grads_image_ptr + (b_in * depth + d) * image_height * image_width;
         const float dtop = (1 - y_lerp) * grads_ptr[out_idx];
         atomicAdd(
-            pimage + top_y_index * image_width + left_x_index, 
+            pimage + top_y_index * image_width + left_x_index,
             (1 - x_lerp) * dtop
         );
         atomicAdd(
-            pimage + top_y_index * image_width + right_x_index, 
+            pimage + top_y_index * image_width + right_x_index,
             x_lerp * dtop
         );
 
         const float dbottom = y_lerp * grads_ptr[out_idx];
         atomicAdd(
-            pimage + bottom_y_index * image_width + left_x_index, 
+            pimage + bottom_y_index * image_width + left_x_index,
             (1 - x_lerp) * dbottom
         );
         atomicAdd(
-            pimage + bottom_y_index * image_width + right_x_index, 
+            pimage + bottom_y_index * image_width + right_x_index,
             x_lerp * dbottom
         );
     }
@@ -169,8 +169,8 @@ void CropAndResizeLaucher(
     const float *image_ptr, const float *boxes_ptr,
     const int *box_ind_ptr, int num_boxes, int batch, int image_height,
     int image_width, int crop_height, int crop_width, int depth,
-    float extrapolation_value, float *crops_ptr, cudaStream_t stream)
-{   
+    float extrapolation_value, float *crops_ptr)
+{
     const int total_count = num_boxes * crop_height * crop_width * depth;
     const int thread_per_block = 1024;
     const int block_count = (total_count + thread_per_block - 1) / thread_per_block;
@@ -178,7 +178,7 @@ void CropAndResizeLaucher(
 
     if (total_count > 0)
     {
-        CropAndResizeKernel<<<block_count, thread_per_block, 0, stream>>>(
+        CropAndResizeKernel<<<block_count, thread_per_block, 0>>>(
             total_count, image_ptr, boxes_ptr,
             box_ind_ptr, num_boxes, batch, image_height, image_width,
             crop_height, crop_width, depth, extrapolation_value, crops_ptr);
@@ -197,8 +197,8 @@ void CropAndResizeBackpropImageLaucher(
     const float *grads_ptr, const float *boxes_ptr,
     const int *box_ind_ptr, int num_boxes, int batch, int image_height,
     int image_width, int crop_height, int crop_width, int depth,
-    float *grads_image_ptr, cudaStream_t stream)
-{   
+    float *grads_image_ptr)
+{
     const int total_count = num_boxes * crop_height * crop_width * depth;
     const int thread_per_block = 1024;
     const int block_count = (total_count + thread_per_block - 1) / thread_per_block;
@@ -206,7 +206,7 @@ void CropAndResizeBackpropImageLaucher(
 
     if (total_count > 0)
     {
-        CropAndResizeBackpropImageKernel<<<block_count, thread_per_block, 0, stream>>>(
+        CropAndResizeBackpropImageKernel<<<block_count, thread_per_block, 0>>>(
             total_count, grads_ptr, boxes_ptr,
             box_ind_ptr, num_boxes, batch, image_height, image_width,
             crop_height, crop_width, depth, grads_image_ptr);

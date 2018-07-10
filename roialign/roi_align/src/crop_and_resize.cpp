@@ -5,18 +5,18 @@
 
 
 void CropAndResizePerBox(
-    const float * image_data, 
+    const float * image_data,
     const int batch_size,
     const int depth,
     const int image_height,
     const int image_width,
 
-    const float * boxes_data, 
+    const float * boxes_data,
     const int * box_index_data,
-    const int start_box, 
+    const int start_box,
     const int limit_box,
 
-    float * corps_data,
+    float * crops_data,
     const int crop_height,
     const int crop_width,
     const float extrapolation_value
@@ -63,12 +63,12 @@ void CropAndResizePerBox(
                     for (int d = 0; d < depth; ++d)
                     {
                         // crops(b, y, x, d) = extrapolation_value;
-                        corps_data[crop_elements * b + channel_elements * d + y * crop_width + x] = extrapolation_value;
+                        crops_data[crop_elements * b + channel_elements * d + y * crop_width + x] = extrapolation_value;
                     }
                 }
                 continue;
             }
-            
+
             const int top_y_index = floorf(in_y);
             const int bottom_y_index = ceilf(in_y);
             const float y_lerp = in_y - top_y_index;
@@ -82,29 +82,29 @@ void CropAndResizePerBox(
                 {
                     for (int d = 0; d < depth; ++d)
                     {
-                        corps_data[crop_elements * b + channel_elements * d + y * crop_width + x] = extrapolation_value;
+                        crops_data[crop_elements * b + channel_elements * d + y * crop_width + x] = extrapolation_value;
                     }
                     continue;
                 }
-            
+
                 const int left_x_index = floorf(in_x);
                 const int right_x_index = ceilf(in_x);
                 const float x_lerp = in_x - left_x_index;
 
                 for (int d = 0; d < depth; ++d)
-                {   
+                {
                     const float *pimage = image_data + b_in * image_elements + d * image_channel_elements;
 
                     const float top_left = pimage[top_y_index * image_width + left_x_index];
                     const float top_right = pimage[top_y_index * image_width + right_x_index];
                     const float bottom_left = pimage[bottom_y_index * image_width + left_x_index];
                     const float bottom_right = pimage[bottom_y_index * image_width + right_x_index];
-                    
+
                     const float top = top_left + (top_right - top_left) * x_lerp;
                     const float bottom =
                         bottom_left + (bottom_right - bottom_left) * x_lerp;
-                        
-                    corps_data[crop_elements * b + channel_elements * d + y * crop_width + x] = top + (bottom - top) * y_lerp;
+
+                    crops_data[crop_elements * b + channel_elements * d + y * crop_width + x] = top + (bottom - top) * y_lerp;
                 }
             }   // end for x
         }   // end for y
@@ -161,7 +161,7 @@ void crop_and_resize_backward(
     THIntTensor * box_index,    // range in [0, batch_size)
     THFloatTensor * grads_image // resize to [bsize, c, hc, wc]
 )
-{   
+{
     // shape
     const int batch_size = grads_image->size[0];
     const int depth = grads_image->size[1];
@@ -235,7 +235,7 @@ void crop_and_resize_backward(
                 const float x_lerp = in_x - left_x_index;
 
                 for (int d = 0; d < depth; ++d)
-                {   
+                {
                     float *pimage = grads_image_data + b_in * image_elements + d * image_channel_elements;
                     const float grad_val = grads_data[crop_elements * b + channel_elements * d + y * crop_width + x];
 
