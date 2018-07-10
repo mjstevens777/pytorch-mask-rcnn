@@ -5,9 +5,9 @@
 int cpu_nms(THLongTensor * keep_out, THLongTensor * num_out, THFloatTensor * boxes, THLongTensor * order, THFloatTensor * areas, float nms_overlap_thresh) {
     // boxes has to be sorted
     THArgCheck(THLongTensor_isContiguous(keep_out), 0, "keep_out must be contiguous");
-    THArgCheck(THLongTensor_isContiguous(boxes), 2, "boxes must be contiguous");
+    THArgCheck(THFloatTensor_isContiguous(boxes), 2, "boxes must be contiguous");
     THArgCheck(THLongTensor_isContiguous(order), 3, "order must be contiguous");
-    THArgCheck(THLongTensor_isContiguous(areas), 4, "areas must be contiguous");
+    THArgCheck(THFloatTensor_isContiguous(areas), 4, "areas must be contiguous");
     // Number of ROIs
     long boxes_num = THFloatTensor_size(boxes, 0);
     long boxes_dim = THFloatTensor_size(boxes, 1);

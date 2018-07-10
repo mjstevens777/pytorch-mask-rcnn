@@ -27,7 +27,7 @@ int gpu_nms(THLongTensor * keep, THLongTensor* num_out, THCudaTensor * boxes, fl
 
   const int col_blocks = DIVUP(boxes_num, threadsPerBlock);
   THCudaLongTensor * mask = THCudaLongTensor_newWithSize2d(state, boxes_num, col_blocks);
-  unsigned long long* mask_flat = THCudaLongTensor_data(state, mask);
+  long* mask_flat = THCudaLongTensor_data(state, mask);
 
   _nms(boxes_num, boxes_flat, mask_flat, nms_overlap_thresh);
 
@@ -35,10 +35,10 @@ int gpu_nms(THLongTensor * keep, THLongTensor* num_out, THCudaTensor * boxes, fl
   THLongTensor_copyCuda(state, mask_cpu, mask);
   THCudaLongTensor_free(state, mask);
 
-  unsigned long long * mask_cpu_flat = THLongTensor_data(mask_cpu);
+  long * mask_cpu_flat = THLongTensor_data(mask_cpu);
 
   THLongTensor * remv_cpu = THLongTensor_newWithSize1d(col_blocks);
-  unsigned long long* remv_cpu_flat = THLongTensor_data(remv_cpu);
+  long* remv_cpu_flat = THLongTensor_data(remv_cpu);
   THLongTensor_fill(remv_cpu, 0);
 
   long * keep_flat = THLongTensor_data(keep);
@@ -51,7 +51,7 @@ int gpu_nms(THLongTensor * keep, THLongTensor* num_out, THCudaTensor * boxes, fl
 
     if (!(remv_cpu_flat[nblock] & (1ULL << inblock))) {
       keep_flat[num_to_keep++] = i;
-      unsigned long long *p = &mask_cpu_flat[0] + i * col_blocks;
+      long *p = &mask_cpu_flat[0] + i * col_blocks;
       for (j = nblock; j < col_blocks; j++) {
         remv_cpu_flat[j] |= p[j];
       }
