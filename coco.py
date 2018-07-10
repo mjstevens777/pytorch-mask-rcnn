@@ -46,8 +46,8 @@ import urllib.request
 import shutil
 
 from config import Config
-import utils
-import model as modellib
+import pytorch_mask_rcnn.utils as utils
+import pytorch_mask_rcnn.model as modellib
 
 import torch
 

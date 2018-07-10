@@ -21,10 +21,10 @@ import torch.optim as optim
 import torch.utils.data
 from torch.autograd import Variable
 
-import utils
-import visualize
-from nms.nms_wrapper import nms
-from roialign.roi_align.crop_and_resize import CropAndResizeFunction
+import pytorch_mask_rcnn.utils as utils
+import pytorch_mask_rcnn.visualize as visualize
+from pytorch_mask_rcnn.nms.nms_wrapper import nms
+from pytorch_mask_rcnn.roialign.roi_align.crop_and_resize import CropAndResizeFunction
 
 
 ############################################################
