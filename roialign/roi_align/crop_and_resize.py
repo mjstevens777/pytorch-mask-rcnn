@@ -3,8 +3,20 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Function
+import torch.utils.cpp_extension as cpp_extension
+import os
 
-from ._ext import crop_and_resize as _backend
+_cpu_backend = cpp_extension.load(
+    "cpu_crop_and_resize", [
+        os.path.join(os.path.dirname(__file__), "src/crop_and_resize.c")
+    ])
+
+
+_gpu_backend = cpp_extension.load(
+    "gpu_crop_and_resize", [
+        os.path.join(os.path.dirname(__file__), "src/crop_and_resize_gpu.c"),
+        os.path.join(os.path.dirname(__file__), "src/cuda/crop_and_resize_kernel.cu"),
+    ])
 
 
 class CropAndResizeFunction(Function):
@@ -18,11 +30,11 @@ class CropAndResizeFunction(Function):
         crops = torch.zeros_like(image)
 
         if image.is_cuda:
-            _backend.crop_and_resize_gpu_forward(
+            _gpu_backend.crop_and_resize_gpu_forward(
                 image, boxes, box_ind,
                 self.extrapolation_value, self.crop_height, self.crop_width, crops)
         else:
-            _backend.crop_and_resize_forward(
+            _cpu_backend.crop_and_resize_forward(
                 image, boxes, box_ind,
                 self.extrapolation_value, self.crop_height, self.crop_width, crops)
 
@@ -39,11 +51,11 @@ class CropAndResizeFunction(Function):
         grad_image = torch.zeros_like(grad_outputs).resize_(*self.im_size)
 
         if grad_outputs.is_cuda:
-            _backend.crop_and_resize_gpu_backward(
+            _gpu_backend.crop_and_resize_gpu_backward(
                 grad_outputs, boxes, box_ind, grad_image
             )
         else:
-            _backend.crop_and_resize_backward(
+            _cpu_backend.crop_and_resize_backward(
                 grad_outputs, boxes, box_ind, grad_image
             )
 

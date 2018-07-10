@@ -1,3 +1,4 @@
+#include <torch/torch.h>
 #include <TH/TH.h>
 #include <stdio.h>
 #include <math.h>
@@ -249,4 +250,20 @@ void crop_and_resize_backward(
             }   // end x
         }   // end y
     }   // end b
+}
+
+PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+  m.def(
+    "crop_and_resize_forward", &crop_and_resize_forward, R"docstring(
+      Crop and resize forward
+    )docstring",
+    py::arg("image"), py::arg("boxes"), py::arg("box_index"),
+    py::arg("extrapolation_value"), py::arg("crop_height"),
+    py::arg("crop_width"), py::arg("crops"));
+  m.def(
+    "crop_and_resize_backward", &crop_and_resize_backward, R"docstring(
+      Crop and resize backward
+    )docstring",
+    py::arg("grads"), py::arg("boxes"), py::arg("box_index"),
+    py::arg("grads_image"));
 }

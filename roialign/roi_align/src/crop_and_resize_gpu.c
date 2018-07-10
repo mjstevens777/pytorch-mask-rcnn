@@ -1,3 +1,4 @@
+#include <torch/torch.h>
 #include <THC/THC.h>
 #include "cuda/crop_and_resize_kernel.h"
 
@@ -66,4 +67,20 @@ void crop_and_resize_gpu_backward(
         THCudaTensor_data(state, grads_image),
         stream
     );
+}
+
+PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+  m.def(
+    "crop_and_resize_gpu_forward", &crop_and_resize_gpu_forward, R"docstring(
+      Crop and resize forward
+    )docstring",
+    py::arg("image"), py::arg("boxes"), py::arg("box_index"),
+    py::arg("extrapolation_value"), py::arg("crop_height"),
+    py::arg("crop_width"), py::arg("crops"));
+  m.def(
+    "crop_and_resize_gpu_backward", &crop_and_resize_gpu_backward, R"docstring(
+      Crop and resize backward
+    )docstring",
+    py::arg("grads"), py::arg("boxes"), py::arg("box_index"),
+    py::arg("grads_image"));
 }
