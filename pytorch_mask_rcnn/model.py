@@ -949,6 +949,8 @@ class Classifier(nn.Module):
         self.linear_bbox = nn.Linear(1024, num_classes * 4)
 
     def forward(self, x, rois):
+        printMemoryUsage("Before Classifier RoiAlign:")
+        print("ROI Size", rois.size())
         x = pyramid_roi_align([rois]+x, self.pool_size, self.image_shape)
         printMemoryUsage("After Classifier RoiAlign:")
         x = self.conv1(x)
