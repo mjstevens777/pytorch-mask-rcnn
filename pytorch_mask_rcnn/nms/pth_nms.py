@@ -11,7 +11,7 @@ _cpu_nms = torch.utils.cpp_extension.load(
 if torch.cuda.is_available():
     arch = os.getenv('CUDA_ARCH')
     if arch:
-        extra_cuda_cflags = ['--arch', arch]
+        extra_cuda_cflags = ['-arch', arch]
     else:
         extra_cuda_cflags = []
     _gpu_nms = torch.utils.cpp_extension.load(
