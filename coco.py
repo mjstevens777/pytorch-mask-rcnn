@@ -45,7 +45,7 @@ import zipfile
 import urllib.request
 import shutil
 
-from config import Config
+from pytorch_mask_rcnn.config import Config
 import pytorch_mask_rcnn.utils as utils
 import pytorch_mask_rcnn.model as modellib
 

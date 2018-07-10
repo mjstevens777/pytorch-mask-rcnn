@@ -8,9 +8,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 import coco
-import utils
-import model as modellib
-import visualize
+import pytorch_mask_rcnn.utils as utils
+import pytorch_mask_rcnn.model as modellib
+import pytorch_mask_rcnn.visualize as visualize
 
 import torch
 
@@ -33,7 +33,7 @@ class InferenceConfig(coco.CocoConfig):
     # Set batch size to 1 since we'll be running inference on
     # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
     # GPU_COUNT = 0 for CPU
-    GPU_COUNT = 1
+    GPU_COUNT = 1 if torch.cuda.is_available() else 0
     IMAGES_PER_GPU = 1
 
 config = InferenceConfig()
