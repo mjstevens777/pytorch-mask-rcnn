@@ -47,8 +47,8 @@ Examples of generated masks. These then get scaled and placed on the image in th
 
         git clone https://github.com/multimodallearning/pytorch-mask-rcnn.git
 
-    
-2. We use functions from two more repositories that need to be build with the right `--arch` option for cuda support.
+
+2. We use functions from two more repositories that need to be built with the right `--arch` option for cuda support.
 The two functions are Non-Maximum Suppression from ruotianluo's [pytorch-faster-rcnn](https://github.com/ruotianluo/pytorch-faster-rcnn)
 repository and longcw's [RoiAlign](https://github.com/longcw/RoIAlign.pytorch).
 
@@ -59,23 +59,18 @@ repository and longcw's [RoiAlign](https://github.com/longcw/RoIAlign.pytorch).
     | GTX 1070 | sm_61 |
     | GTX 1080 (Ti) | sm_61 |
 
-        cd nms/src/cuda/
-        nvcc -c -o nms_kernel.cu.o nms_kernel.cu -x cu -Xcompiler -fPIC -arch=[arch]
-        cd ../../
-        python build.py
-        cd ../
-
-        cd roialign/roi_align/src/cuda/
-        nvcc -c -o crop_and_resize_kernel.cu.o crop_and_resize_kernel.cu -x cu -Xcompiler -fPIC -arch=[arch]
-        cd ../../
-        python build.py
-        cd ../../
+        export CUDA_ARCH=[arch]
 
 3. As we use the [COCO dataset](http://cocodataset.org/#home) install the [Python COCO API](https://github.com/cocodataset/cocoapi) and
 create a symlink.
 
+        # Symlink method
         ln -s /path/to/coco/cocoapi/PythonAPI/pycocotools/ pycocotools
-    
+
+        # Or you can use pip:
+        pip3 install cython
+        pip3 install pycocotools
+
 4. Download the pretrained models on COCO and ImageNet from [Google Drive](https://drive.google.com/open?id=1LXUgC2IZUYNEoXr05tdqyKFZY0pZyPDc).
 
 ## Demo
@@ -84,7 +79,7 @@ To test your installation simply run the demo with
 
     python demo.py
 
-It works on CPU or GPU and the result should look like this:
+It works on CPU or GPU and will automatically compile the necessary extensions. The result should look like this:
 
 ![](assets/park.png)
 

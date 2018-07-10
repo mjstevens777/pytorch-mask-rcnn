@@ -9,11 +9,16 @@ _cpu_nms = torch.utils.cpp_extension.load(
     ])
 
 if torch.cuda.is_available():
+    arch = os.getenv('CUDA_ARCH')
+    if arch:
+        extra_cuda_cflags = ['--arch', arch]
+    else:
+        extra_cuda_cflags = []
     _gpu_nms = torch.utils.cpp_extension.load(
         'gpu_nms', [
             os.path.join(os.path.dirname(__file__), 'src/nms_cuda.cpp'),
             os.path.join(os.path.dirname(__file__), 'src/cuda/nms_kernel.cu')
-        ])
+        ], extra_cuda_cflags=extra_cuda_cflags)
 
 def pth_nms(dets, thresh):
   """
