@@ -6,12 +6,12 @@ int cpu_nms(at::Tensor keep_out, at::Tensor num_out, at::Tensor boxes, at::Tenso
     // boxes has to be sorted
 
     // Number of ROIs
-    long boxes_num = boxes.size(0);
-    long boxes_dim = boxes.size(1);
+    long long boxes_num = boxes.size(0);
+    long long boxes_dim = boxes.size(1);
 
-    long * keep_out_flat = keep_out.contiguous().data<long>();
+    long long * keep_out_flat = keep_out.contiguous().data<long long>();
     float * boxes_flat = boxes.contiguous().data<float>();
-    long * order_flat = order.contiguous().data<long>();
+    long long * order_flat = order.contiguous().data<long long>();
     float * areas_flat = areas.contiguous().data<float>();
 
     at::Tensor suppressed = at::zeros(at::CPU(at::kByte), {boxes_num});
@@ -28,7 +28,7 @@ int cpu_nms(at::Tensor keep_out, at::Tensor num_out, at::Tensor boxes, at::Tenso
     float w, h;
     float inter, ovr;
 
-    long num_to_keep = 0;
+    long long num_to_keep = 0;
     for (_i=0; _i < boxes_num; ++_i) {
         i = order_flat[_i];
         if (suppressed_flat[i] == 1) {
@@ -59,7 +59,7 @@ int cpu_nms(at::Tensor keep_out, at::Tensor num_out, at::Tensor boxes, at::Tenso
         }
     }
 
-    long *num_out_flat = num_out.contiguous().data<long>();
+    long long *num_out_flat = num_out.contiguous().data<long long>();
     *num_out_flat = num_to_keep;
     return 1;
 }
