@@ -2,24 +2,20 @@
 #include <TH/TH.h>
 #include <math.h>
 
-int cpu_nms(THLongTensor * keep_out, THLongTensor * num_out, THFloatTensor * boxes, THLongTensor * order, THFloatTensor * areas, float nms_overlap_thresh) {
+int cpu_nms(at::Tensor keep_out, at::Tensor num_out, at::Tensor boxes, at::Tensor order, at::Tensor areas, float nms_overlap_thresh) {
     // boxes has to be sorted
-    THArgCheck(THLongTensor_isContiguous(keep_out), 0, "keep_out must be contiguous");
-    THArgCheck(THFloatTensor_isContiguous(boxes), 2, "boxes must be contiguous");
-    THArgCheck(THLongTensor_isContiguous(order), 3, "order must be contiguous");
-    THArgCheck(THFloatTensor_isContiguous(areas), 4, "areas must be contiguous");
+
     // Number of ROIs
-    long boxes_num = THFloatTensor_size(boxes, 0);
-    long boxes_dim = THFloatTensor_size(boxes, 1);
+    long boxes_num = boxes.size(0);
+    long boxes_dim = boxes.size(1);
 
-    long * keep_out_flat = THLongTensor_data(keep_out);
-    float * boxes_flat = THFloatTensor_data(boxes);
-    long * order_flat = THLongTensor_data(order);
-    float * areas_flat = THFloatTensor_data(areas);
+    long * keep_out_flat = keep_out.contiguous().data<long>();
+    float * boxes_flat = boxes.contiguous().data<float>();
+    long * order_flat = order.contiguous().data<long>();
+    float * areas_flat = areas.contiguous().data<float>();
 
-    THByteTensor* suppressed = THByteTensor_newWithSize1d(boxes_num);
-    THByteTensor_fill(suppressed, 0);
-    unsigned char * suppressed_flat =  THByteTensor_data(suppressed);
+    at::Tensor suppressed = at::zeros(at::CPU(at::kByte), {boxes_num});
+    unsigned char * suppressed_flat =  suppressed.data<unsigned char>();
 
     // nominal indices
     int i, j;
@@ -63,9 +59,8 @@ int cpu_nms(THLongTensor * keep_out, THLongTensor * num_out, THFloatTensor * box
         }
     }
 
-    long *num_out_flat = THLongTensor_data(num_out);
+    long *num_out_flat = num_out.contiguous().data<long>();
     *num_out_flat = num_to_keep;
-    THByteTensor_free(suppressed);
     return 1;
 }
 

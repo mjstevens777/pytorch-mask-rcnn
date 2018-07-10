@@ -13,35 +13,29 @@
 #include "cuda/nms_kernel.h"
 
 
-extern THCState *state;
-
-int gpu_nms(THLongTensor * keep, THLongTensor* num_out, THCudaTensor * boxes, float nms_overlap_thresh) {
+int gpu_nms(at::Tensor keep, at::Tensor num_out, at::Tensor boxes, float nms_overlap_thresh) {
   // boxes has to be sorted
-  THArgCheck(THLongTensor_isContiguous(keep), 0, "boxes must be contiguous");
-  THArgCheck(THCudaTensor_isContiguous(state, boxes), 2, "boxes must be contiguous");
-  // Number of ROIs
-  int boxes_num = THCudaTensor_size(state, boxes, 0);
-  int boxes_dim = THCudaTensor_size(state, boxes, 1);
 
-  float* boxes_flat = THCudaTensor_data(state, boxes);
+  // Number of ROIs
+  int boxes_num = boxes.size(0);
+  int boxes_dim = boxes.size(1);
+
+  float* boxes_flat = boxes.contiguous().data<float>();
 
   const int col_blocks = DIVUP(boxes_num, threadsPerBlock);
-  THCudaLongTensor * mask = THCudaLongTensor_newWithSize2d(state, boxes_num, col_blocks);
-  long* mask_flat = THCudaLongTensor_data(state, mask);
+  at::Tensor mask = at::empty(at::CUDA(at::kLong), {boxes_num, col_blocks});
+  long* mask_flat = mask.data<long>();
 
   _nms(boxes_num, boxes_flat, mask_flat, nms_overlap_thresh);
 
-  THLongTensor * mask_cpu = THLongTensor_newWithSize2d(boxes_num, col_blocks);
-  THLongTensor_copyCuda(state, mask_cpu, mask);
-  THCudaLongTensor_free(state, mask);
+  at::Tensor mask_cpu = mask.toBackend(at::Backend::CPU);
 
-  long * mask_cpu_flat = THLongTensor_data(mask_cpu);
+  long * mask_cpu_flat = mask_cpu.data<long>();
 
-  THLongTensor * remv_cpu = THLongTensor_newWithSize1d(col_blocks);
-  long* remv_cpu_flat = THLongTensor_data(remv_cpu);
-  THLongTensor_fill(remv_cpu, 0);
+  at::Tensor remv_cpu = at::zeros(at::CPU(at::kLong), {col_blocks});
+  long* remv_cpu_flat = remv_cpu.data<long>();
 
-  long * keep_flat = THLongTensor_data(keep);
+  long * keep_flat = keep.data<long>();
   long num_to_keep = 0;
 
   int i, j;
@@ -58,11 +52,8 @@ int gpu_nms(THLongTensor * keep, THLongTensor* num_out, THCudaTensor * boxes, fl
     }
   }
 
-  long * num_out_flat = THLongTensor_data(num_out);
+  long * num_out_flat = num_out.data<long>();
   * num_out_flat = num_to_keep;
-
-  THLongTensor_free(mask_cpu);
-  THLongTensor_free(remv_cpu);
 
   return 1;
 }

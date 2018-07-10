@@ -5,13 +5,13 @@ import os
 
 _cpu_nms = torch.utils.cpp_extension.load(
     'cpu_nms', [
-        os.path.join(os.path.dirname(__file__), 'src/nms.c')
+        os.path.join(os.path.dirname(__file__), 'src/nms.cpp')
     ])
 
 if torch.cuda.is_available():
     _gpu_nms = torch.utils.cpp_extension.load(
         'gpu_nms', [
-            os.path.join(os.path.dirname(__file__), 'src/nms_cuda.c'),
+            os.path.join(os.path.dirname(__file__), 'src/nms_cuda.cpp'),
             os.path.join(os.path.dirname(__file__), 'src/cuda/nms_kernel.cu')
         ])
 
