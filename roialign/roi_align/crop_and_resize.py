@@ -12,11 +12,12 @@ _cpu_backend = cpp_extension.load(
     ])
 
 
-_gpu_backend = cpp_extension.load(
-    "gpu_crop_and_resize", [
-        os.path.join(os.path.dirname(__file__), "src/crop_and_resize_gpu.cpp"),
-        os.path.join(os.path.dirname(__file__), "src/cuda/crop_and_resize_kernel.cu"),
-    ])
+if torch.cuda.is_available():
+    _gpu_backend = cpp_extension.load(
+        "gpu_crop_and_resize", [
+            os.path.join(os.path.dirname(__file__), "src/crop_and_resize_gpu.cpp"),
+            os.path.join(os.path.dirname(__file__), "src/cuda/crop_and_resize_kernel.cu"),
+        ])
 
 
 class CropAndResizeFunction(Function):
